@@ -1,0 +1,24 @@
+{
+  "name": "Sunset Coral & Amber",
+  "dataColors": [
+    "#EA580C",
+    "#F97316",
+    "#FB923C",
+    "#C2410C",
+    "#F59E0B",
+    "#E11D48",
+    "#F43F5E",
+    "#FED7AA"
+  ],
+  "background": "#FFF7ED",
+  "foreground": "#431407",
+  "tableAccent": "#EA580C",
+  "visualStyles": {
+    "*": {
+      "*": {
+        "border": [{ "show": true, "radius": 8, "color": { "solid": { "color": "#FED7AA" } } }],
+        "dropShadow": [{ "show": true, "preset": "BottomRight" }]
+      }
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "name": "Healthcare Analytics Dark/Light Modern",
+  "dataColors": [
+    "#1B365D",
+    "#00A3E0",
+    "#2E7D32",
+    "#E65100",
+    "#D32F2F",
+    "#7B1FA2",
+    "#00838F",
+    "#FBC02D"
+  ],
+  "background": "#F4F7F9",
+  "foreground": "#1B365D",
+  "tableAccent": "#00A3E0",
+  "visualStyles": {
+    "*": {
+      "*": {
+        "outspacePane": [
+          {
+            "backgroundColor": { "solid": { "color": "#FFFFFF" } }
+          }
+        ],
+        "border": [
+          {
+            "show": true,
+            "radius": 8,
+            "color": { "solid": { "color": "#E2E8F0" } }
+          }
+        ],
+        "dropShadow": [
+          {
+            "show": true,
+            "preset": "BottomRight"
+          }
+        ]
+      }
+    },
+    "card": {
+      "*": {
+        "labels": [
+          {
+            "color": { "solid": { "color": "#1B365D" } },
+            "fontSize": 24,
+            "fontFamily": "Segoe UI Semibold"
+          }
+        ],
+        "categoryLabels": [
+          
+          {
+            "color": { "solid": { "color": "#64748B" } },
+            "fontSize": 11,
+            "fontFamily": "Segoe UI"
+          }
+        ]
+      }
+    }
+  }
+}

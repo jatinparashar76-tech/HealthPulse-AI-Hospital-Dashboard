@@ -1,0 +1,59 @@
+{
+  "name": "Healthcare Executive Dark Ops",
+  "dataColors": [
+    "#38BDF8",
+    "#34D399",
+    "#F43F5E",
+    "#FBBF24",
+    "#A78BFA",
+    "#2DD4BF",
+    "#FB923C",
+    "#818CF8"
+  ],
+  "background": "#0B1329",
+  "foreground": "#F8FAFC",
+  "tableAccent": "#38BDF8",
+  "visualStyles": {
+    "*": {
+      "*": {
+        "outspacePane": [
+          {
+            "backgroundColor": { "solid": { "color": "#111C44" } },
+            "foregroundColor": { "solid": { "color": "#F8FAFC" } }
+          }
+        ],
+        "border": [
+          {
+            "show": true,
+            "radius": 10,
+            "color": { "solid": { "color": "#1E293B" } }
+          }
+        ],
+        "dropShadow": [
+          {
+            "show": true,
+            "preset": "BottomRight"
+          }
+        ]
+      }
+    },
+    "card": {
+      "*": {
+        "labels": [
+          {
+            "color": { "solid": { "color": "#38BDF8" } },
+            "fontSize": 24,
+            "fontFamily": "Segoe UI Semibold"
+          }
+        ],
+        "categoryLabels": [
+          {
+            "color": { "solid": { "color": "#94A3B8" } },
+            "fontSize": 11,
+            "fontFamily": "Segoe UI"
+          }
+        ]
+      }
+    }
+  }
+}

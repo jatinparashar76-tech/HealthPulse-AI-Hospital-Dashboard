@@ -1,0 +1,24 @@
+{
+  "name": "Clinical Emerald Green",
+  "dataColors": [
+    "#059669",
+    "#10B981",
+    "#34D399",
+    "#047857",
+    "#065F46",
+    "#14B8A6",
+    "#0D9488",
+    "#6EE7B7"
+  ],
+  "background": "#F0FDF4",
+  "foreground": "#064E3B",
+  "tableAccent": "#059669",
+  "visualStyles": {
+    "*": {
+      "*": {
+        "border": [{ "show": true, "radius": 8, "color": { "solid": { "color": "#A7F3D0" } } }],
+        "dropShadow": [{ "show": true, "preset": "BottomRight" }]
+      }
+    }
+  }
+}
