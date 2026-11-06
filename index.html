@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthPulse AI - Hospital Intelligence & Clinical Decision System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        /* ------------------------------------------------------------- */
+        /* DYNAMIC COLOUR THEME CSS VARIABLES                            */
+        /* ------------------------------------------------------------- */
+        :root {
+            --theme-name: 'ocean';
+            --primary: #0284c7;
+            --primary-hover: #0369a1;
+            --primary-light: #e0f2fe;
+            --primary-border: #bae6fd;
+            --bg-page: #f8fafc;
+            --bg-card: #ffffff;
+            --border-card: #e2e8f0;
+            --text-heading: #0f172a;
+            --text-muted: #64748b;
+            --table-header: #f8fafc;
+            --table-hover: #f1f5f9;
+            --chart-main: #0284c7;
+            --chart-sec: #38bdf8;
+            --chart-ter: #818cf8;
+        }
+
+        /* 1. EMERALD MINT THEME */
+        [data-theme="emerald"] {
+            --primary: #059669;
+            --primary-hover: #047857;
+            --primary-light: #d1fae5;
+            --primary-border: #a7f3d0;
+            --bg-page: #f0fdf4;
+            --bg-card: #ffffff;
+            --border-card: #d1fae5;
+            --text-heading: #064e3b;
+            --text-muted: #047857;
+            --table-header: #ecfdf5;
+            --table-hover: #f0fdf4;
+            --chart-main: #059669;
+            --chart-sec: #34d399;
+            --chart-ter: #0d9488;
+        }
+
+        /* 2. ROYAL PURPLE THEME */
+        [data-theme="purple"] {
+            --primary: #7c3aed;
+            --primary-hover: #6d28d9;
+            --primary-light: #ede9fe;
+            --primary-border: #ddd6fe;
+            --bg-page: #faf5ff;
+            --bg-card: #ffffff;
+            --border-card: #ede9fe;
+            --text-heading: #3b0764;
+            --text-muted: #6b21a8;
+            --table-header: #f3e8ff;
+            --table-hover: #faf5ff;
+            --chart-main: #7c3aed;
+            --chart-sec: #a78bfa;
+            --chart-ter: #c084fc;
+        }
+
+        /* 3. SUNSET CORAL THEME */
+        [data-theme="coral"] {
+            --primary: #ea580c;
+            --primary-hover: #c2410c;
+            --primary-light: #ffedd5;
+            --primary-border: #fed7aa;
+            --bg-page: #fff7ed;
+            --bg-card: #ffffff;
+            --border-card: #ffedd5;
+            --text-heading: #431407;
+            --text-muted: #9a3412;
+            --table-header: #ffedd5;
+            --table-hover: #fff7ed;
+            --chart-main: #ea580c;
+            --chart-sec: #fb923c;
+            --chart-ter: #f59e0b;
+        }
+
+        /* 4. MIDNIGHT CYBER DARK THEME */
+        [data-theme="midnight"] {
+            --primary: #38bdf8;
+            --primary-hover: #0284c7;
+            --primary-light: rgba(56, 189, 248, 0.15);
+            --primary-border: #1e293b;
+            --bg-page: #0b1329;
+            --bg-card: #111c44;
+            --border-card: #1e293b;
+            --text-heading: #f8fafc;
+            --text-muted: #94a3b8;
+            --table-header: #0e1738;
+            --table-hover: #16224e;
+            --chart-main: #38bdf8;
+            --chart-sec: #34d399;
+            --chart-ter: #818cf8;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-heading);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .themed-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-card);
+            transition: all 0.3s ease;
+        }
+
+        .themed-header {
+            background-color: var(--bg-card);
+            border-bottom: 1px solid var(--border-card);
+        }
+
+        .theme-btn-primary {
+            background-color: var(--primary);
+            color: #ffffff;
+            transition: all 0.2s ease;
+        }
+        .theme-btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .theme-badge {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            border: 1px solid var(--primary-border);
+        }
+
+        .tab-btn {
+            border-bottom: 3px solid transparent;
+            color: var(--text-muted);
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .tab-btn.active {
+            border-bottom-color: var(--primary);
+            color: var(--primary);
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Top Navigation Bar -->
+    <header class="themed-header sticky top-0 z-40 shadow-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Brand -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl theme-btn-primary flex items-center justify-center text-white shadow-md">
+                        <i class="fa-solid fa-heart-pulse text-lg"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-bold tracking-tight" style="color: var(--text-heading);">HealthPulse<span style="color: var(--primary);">AI</span></span>
+                        <span class="hidden md:inline-block text-xs font-semibold theme-badge ml-2 px-2.5 py-0.5 rounded-full">Hospital Decision System</span>
+                    </div>
+                </div>
+
+                <!-- Live Status & COLOR THEME PICKER -->
+                <div class="flex items-center space-x-3">
+                    <!-- Theme Selector Dropdown -->
+                    <div class="relative inline-block text-left">
+                        <div class="flex items-center space-x-1.5 p-1 rounded-xl themed-card">
+                            <span class="text-xs font-semibold px-2 py-1 text-slate-500 hidden sm:inline"><i class="fa-solid fa-palette mr-1"></i>Theme:</span>
+                            <button onclick="setColourTheme('ocean')" title="Ocean Blue Theme" class="w-6 h-6 rounded-lg bg-sky-500 hover:scale-110 transition border border-white/40 shadow-sm"></button>
+                            <button onclick="setColourTheme('emerald')" title="Clinical Emerald Theme" class="w-6 h-6 rounded-lg bg-emerald-500 hover:scale-110 transition border border-white/40 shadow-sm"></button>
+                            <button onclick="setColourTheme('purple')" title="Royal Purple Theme" class="w-6 h-6 rounded-lg bg-purple-600 hover:scale-110 transition border border-white/40 shadow-sm"></button>
+                            <button onclick="setColourTheme('coral')" title="Sunset Coral Theme" class="w-6 h-6 rounded-lg bg-orange-500 hover:scale-110 transition border border-white/40 shadow-sm"></button>
+                            <button onclick="setColourTheme('midnight')" title="Midnight Dark Theme" class="w-6 h-6 rounded-lg bg-slate-900 hover:scale-110 transition border border-cyan-400 shadow-sm text-cyan-400 text-xs flex items-center justify-center"><i class="fa-solid fa-moon text-[10px]"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Export CSV Button -->
+                    <a href="/api/export" class="inline-flex items-center px-3.5 py-1.5 rounded-xl text-xs font-semibold themed-card hover:opacity-80 transition shadow-sm">
+                        <i class="fa-solid fa-file-export mr-1.5 text-slate-400"></i> Export CSV
+                    </a>
+                </div>
+            </div>
+
+            <!-- Page Navigation Tabs -->
+            <div class="flex space-x-8 -mb-px">
+                <button onclick="switchTab('overview')" id="tab-btn-overview" class="tab-btn active py-3 text-sm flex items-center space-x-2">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Executive Overview</span>
+                </button>
+                <button onclick="switchTab('predictor')" id="tab-btn-predictor" class="tab-btn py-3 text-sm flex items-center space-x-2">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>AI Clinical Predictor</span>
+                </button>
+                <button onclick="switchTab('patients')" id="tab-btn-patients" class="tab-btn py-3 text-sm flex items-center space-x-2">
+                    <i class="fa-solid fa-hospital-user"></i>
+                    <span>Patient Registry</span>
+                </button>
+                <button onclick="switchTab('analytics')" id="tab-btn-analytics" class="tab-btn py-3 text-sm flex items-center space-x-2">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Deep Analytics</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- ========================================================================= -->
+        <!-- TAB 1: EXECUTIVE OVERVIEW -->
+        <!-- ========================================================================= -->
+        <section id="tab-overview" class="space-y-6">
+            <!-- KPI Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <!-- Total Patients -->
+                <div class="themed-card p-5 rounded-2xl shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Admissions</span>
+                        <div class="w-8 h-8 rounded-lg theme-badge flex items-center justify-center text-sm"><i class="fa-solid fa-users"></i></div>
+                    </div>
+                    <div class="text-2xl font-bold mt-2" id="kpi-total-patients">--</div>
+                    <div class="text-xs text-slate-400 mt-1">Hospitalized Patients</div>
+                </div>
+
+                <!-- Total Cost -->
+                <div class="themed-card p-5 rounded-2xl shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Healthcare Cost</span>
+                        <div class="w-8 h-8 rounded-lg theme-badge flex items-center justify-center text-sm"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+                    </div>
+                    <div class="text-2xl font-bold mt-2" id="kpi-total-cost">--</div>
+                    <div class="text-xs text-slate-400 mt-1" id="kpi-avg-cost">Avg: --</div>
+                </div>
+
+                <!-- Length of Stay -->
+                <div class="themed-card p-5 rounded-2xl shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Avg Stay Duration</span>
+                        <div class="w-8 h-8 rounded-lg theme-badge flex items-center justify-center text-sm"><i class="fa-solid fa-calendar-days"></i></div>
+                    </div>
+                    <div class="text-2xl font-bold mt-2" id="kpi-avg-stay">-- Days</div>
+                    <div class="text-xs text-slate-400 mt-1">Inpatient Care</div>
+                </div>
+
+                <!-- Readmission Rate -->
+                <div class="themed-card p-5 rounded-2xl shadow-sm border-l-4 border-rose-500">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-rose-500">Readmission Rate</span>
+                        <div class="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-500 flex items-center justify-center text-sm"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    </div>
+                    <div class="text-2xl font-bold mt-2" id="kpi-readmit-rate">--%</div>
+                    <div class="text-xs text-rose-500 font-medium mt-1" id="kpi-readmit-count">-- Readmitted</div>
+                </div>
+
+                <!-- Patient Satisfaction -->
+                <div class="themed-card p-5 rounded-2xl shadow-sm border-l-4 border-amber-400">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-amber-500">Avg Satisfaction</span>
+                        <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center text-sm"><i class="fa-solid fa-star"></i></div>
+                    </div>
+                    <div class="text-2xl font-bold mt-2" id="kpi-satisfaction">-- / 5.0</div>
+                    <div class="text-xs text-slate-400 mt-1" id="kpi-recovered-rate">Recovery: --%</div>
+                </div>
+            </div>
+
+            <!-- Charts Row 1 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Readmission by Condition -->
+                <div class="themed-card p-6 rounded-2xl shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-base font-semibold">30-Day Readmission Rate (%) by Condition</h3>
+                        <span class="text-xs font-medium text-slate-400 theme-badge px-2 py-1 rounded-md">Critical Cardiology &gt; 95%</span>
+                    </div>
+                    <div class="h-80">
+                        <canvas id="chartReadmitRate"></canvas>
+                    </div>
+                </div>
+
+                <!-- Volume by Condition -->
+                <div class="themed-card p-6 rounded-2xl shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-base font-semibold">Patient Volume by Medical Condition</h3>
+                        <span class="text-xs font-medium text-slate-400 theme-badge px-2 py-1 rounded-md">15 Conditions</span>
+                    </div>
+                    <div class="h-80">
+                        <canvas id="chartConditionVol"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row 2 -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Procedure Cost -->
+                <div class="lg:col-span-2 themed-card p-6 rounded-2xl shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-base font-semibold">Average Treatment Cost ($) by Procedure</h3>
+                        <span class="text-xs font-semibold theme-badge px-2.5 py-1 rounded-md">Financial Analysis</span>
+                    </div>
+                    <div class="h-64">
+                        <canvas id="chartProcCost"></canvas>
+                    </div>
+                </div>
+
+                <!-- Gender Doughnut -->
+                <div class="themed-card p-6 rounded-2xl shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-base font-semibold mb-2">Patient Gender Split</h3>
+                        <div class="h-48 relative flex items-center justify-center">
+                            <canvas id="chartGender"></canvas>
+                        </div>
+                    </div>
+                    <div class="border-t border-slate-200/40 pt-4 flex justify-around text-center text-xs">
+                        <div>
+                            <span class="block text-slate-400">Female</span>
+                            <span class="font-bold text-sm" id="lbl-female-count">--</span>
+                        </div>
+                        <div class="border-r border-slate-200/40"></div>
+                        <div>
+                            <span class="block text-slate-400">Male</span>
+                            <span class="font-bold text-sm" id="lbl-male-count">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 2: AI CLINICAL PREDICTOR -->
+        <!-- ========================================================================= -->
+        <section id="tab-predictor" class="hidden space-y-6">
+            <div class="rounded-3xl p-8 text-white shadow-xl theme-btn-primary">
+                <div class="max-w-3xl">
+                    <span class="bg-white/20 text-white text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider">Machine Learning Engine</span>
+                    <h2 class="text-2xl font-bold mt-3">Predictive Clinical Risk & Patient Satisfaction Scoring</h2>
+                    <p class="text-white/80 text-sm mt-2 leading-relaxed">
+                        Input patient clinical attributes to generate an instant, multi-factor machine learning evaluation. The engine assesses 30-day hospital readmission probability and forecasts the patient satisfaction rating.
+                    </p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Prediction Input Form -->
+                <div class="lg:col-span-6 themed-card p-6 rounded-2xl shadow-sm space-y-5">
+                    <h3 class="text-lg font-bold border-b border-slate-200/30 pb-3 flex items-center">
+                        <i class="fa-solid fa-clipboard-user mr-2" style="color: var(--primary);"></i> Patient Clinical Inputs
+                    </h3>
+
+                    <form id="prediction-form" onsubmit="runPrediction(event)" class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- Age -->
+                            <div>
+                                <label class="block text-xs font-semibold mb-1 text-slate-400">Age (Years)</label>
+                                <input type="number" id="pred-age" value="65" min="1" max="110" required class="w-full px-3.5 py-2 rounded-xl border border-slate-300/40 bg-white/50 text-sm focus:ring-2 focus:ring-sky-500 transition">
+                            </div>
+
+                            <!-- Gender -->
+                            <div>
+                                <label class="block text-xs font-semibold mb-1 text-slate-400">Biological Gender</label>
+                                <select id="pred-gender" class="w-full px-3.5 py-2 rounded-xl border border-slate-300/40 bg-white/50 text-sm focus:ring-2 focus:ring-sky-500 transition">
+                                    <option value="Female">Female</option>
+                                    <option value="Male">Male</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Condition -->
+                        <div>
+                            <label class="block text-xs font-semibold mb-1 text-slate-400">Medical Condition</label>
+                            <select id="pred-condition" onchange="onConditionChange()" class="w-full px-3.5 py-2 rounded-xl border border-slate-300/40 bg-white/50 text-sm focus:ring-2 focus:ring-sky-500 transition">
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+
+                        <!-- Procedure (auto-filled) -->
+                        <div>
+                            <label class="block text-xs font-semibold mb-1 text-slate-400">Procedure Administered</label>
+                            <input type="text" id="pred-procedure" readonly class="w-full px-3.5 py-2 rounded-xl bg-slate-100/50 border border-slate-200/50 text-sm opacity-80">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- Cost -->
+                            <div>
+                                <label class="block text-xs font-semibold mb-1 text-slate-400">Total Treatment Cost ($)</label>
+                                <input type="number" id="pred-cost" value="18000" min="50" step="50" required class="w-full px-3.5 py-2 rounded-xl border border-slate-300/40 bg-white/50 text-sm focus:ring-2 focus:ring-sky-500 transition">
+                            </div>
+
+                            <!-- Length of Stay -->
+                            <div>
+                                <label class="block text-xs font-semibold mb-1 text-slate-400">Length of Stay (Days)</label>
+                                <input type="number" id="pred-los" value="7" min="1" max="180" required class="w-full px-3.5 py-2 rounded-xl border border-slate-300/40 bg-white/50 text-sm focus:ring-2 focus:ring-sky-500 transition">
+                            </div>
+                        </div>
+
+                        <!-- Discharge Outcome -->
+                        <div>
+                            <label class="block text-xs font-semibold mb-1 text-slate-400">Discharge Health Status</label>
+                            <select id="pred-outcome" class="w-full px-3.5 py-2 rounded-xl border border-slate-300/40 bg-white/50 text-sm focus:ring-2 focus:ring-sky-500 transition">
+                                <option value="Stable">Stable</option>
+                                <option value="Recovered">Recovered</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" id="btn-predict" class="w-full theme-btn-primary font-semibold py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <span>Run AI Clinical Risk Assessment</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Prediction Results Display -->
+                <div class="lg:col-span-6 space-y-6">
+                    <div class="themed-card p-6 rounded-2xl shadow-sm" id="result-card">
+                        <div class="flex justify-between items-center border-b border-slate-200/30 pb-4">
+                            <h3 class="text-base font-bold">AI Risk Assessment Results</h3>
+                            <span id="res-risk-tier" class="px-3 py-1 rounded-full text-xs font-extrabold uppercase bg-rose-500/10 text-rose-500 border border-rose-500/30">
+                                CRITICAL RISK
+                            </span>
+                        </div>
+
+                        <!-- Readmission Probability Gauge -->
+                        <div class="mt-6">
+                            <div class="flex justify-between items-end mb-2">
+                                <span class="text-sm font-semibold">30-Day Readmission Probability</span>
+                                <span class="text-2xl font-bold" id="res-readmit-prob">94.0%</span>
+                            </div>
+                            <div class="w-full bg-slate-200/50 rounded-full h-3 overflow-hidden">
+                                <div id="res-prob-bar" class="bg-rose-500 h-3 rounded-full transition-all duration-700" style="width: 94%;"></div>
+                            </div>
+                            <div class="flex justify-between text-xs text-slate-400 mt-1">
+                                <span>0% Low</span>
+                                <span>50% Threshold</span>
+                                <span>100% Critical</span>
+                            </div>
+                        </div>
+
+                        <!-- Predicted Satisfaction Score -->
+                        <div class="mt-6 p-4 rounded-xl themed-card flex items-center justify-between">
+                            <div>
+                                <span class="block text-xs font-semibold uppercase text-slate-400">Forecasted Patient Rating</span>
+                                <span class="text-2xl font-extrabold mt-1" id="res-sat-score">2.0 <span class="text-sm font-normal text-slate-400">/ 5.0</span></span>
+                            </div>
+                            <div class="flex text-amber-400 space-x-1 text-lg" id="res-sat-stars">
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-regular fa-star text-slate-300"></i>
+                                <i class="fa-regular fa-star text-slate-300"></i>
+                                <i class="fa-regular fa-star text-slate-300"></i>
+                            </div>
+                        </div>
+
+                        <!-- AI Recommendations -->
+                        <div class="mt-6">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center">
+                                <i class="fa-solid fa-stethoscope mr-1.5" style="color: var(--primary);"></i> Clinical Action Recommendations
+                            </h4>
+                            <ul id="res-recs-list" class="space-y-2 text-xs">
+                                <li class="flex items-start bg-rose-500/10 p-2.5 rounded-lg border border-rose-500/20 text-rose-600">
+                                    <i class="fa-solid fa-circle-exclamation text-rose-500 mt-0.5 mr-2"></i>
+                                    <span>Schedule proactive tele-health follow-up within 48 to 72 hours of discharge.</span>
+                                </li>
+                                <li class="flex items-start p-2.5 rounded-lg border border-slate-200/40">
+                                    <i class="fa-solid fa-check text-emerald-500 mt-0.5 mr-2"></i>
+                                    <span>Conduct comprehensive medication reconciliation with primary care physician.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 3: PATIENT REGISTRY & MANAGEMENT -->
+        <!-- ========================================================================= -->
+        <section id="tab-patients" class="hidden space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-xl font-bold">Hospital Inpatient Registry</h2>
+                    <p class="text-xs text-slate-400 mt-1">Search, filter, and add verified patient admissions.</p>
+                </div>
+                <button onclick="openAddModal()" class="theme-btn-primary font-semibold py-2 px-4 rounded-xl text-sm shadow-sm transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                    <span>Register New Patient</span>
+                </button>
+            </div>
+
+            <!-- Search & Filters Bar -->
+            <div class="themed-card p-4 rounded-2xl shadow-sm grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                <div class="lg:col-span-2 relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
+                    <input type="text" id="filter-search" oninput="debouncePatientSearch()" placeholder="Search by Patient ID, Condition, Procedure..." class="w-full pl-9 pr-4 py-2 border border-slate-300/40 rounded-xl text-xs bg-white/40">
+                </div>
+
+                <div>
+                    <select id="filter-condition" onchange="loadPatients(1)" class="w-full px-3 py-2 border border-slate-300/40 rounded-xl text-xs bg-white/40">
+                        <option value="">All Conditions</option>
+                    </select>
+                </div>
+
+                <div>
+                    <select id="filter-readmission" onchange="loadPatients(1)" class="w-full px-3 py-2 border border-slate-300/40 rounded-xl text-xs bg-white/40">
+                        <option value="">All Readmissions</option>
+                        <option value="Yes">Readmitted (Yes)</option>
+                        <option value="No">No Readmission (No)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <select id="filter-outcome" onchange="loadPatients(1)" class="w-full px-3 py-2 border border-slate-300/40 rounded-xl text-xs bg-white/40">
+                        <option value="">All Outcomes</option>
+                        <option value="Recovered">Recovered</option>
+                        <option value="Stable">Stable</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Data Table Card -->
+            <div class="themed-card rounded-2xl shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-200/40 font-semibold uppercase tracking-wider text-slate-400" style="background-color: var(--table-header);">
+                                <th class="py-3.5 px-4">Patient ID</th>
+                                <th class="py-3.5 px-4">Demographics</th>
+                                <th class="py-3.5 px-4">Condition & Procedure</th>
+                                <th class="py-3.5 px-4">Length of Stay</th>
+                                <th class="py-3.5 px-4">Treatment Cost</th>
+                                <th class="py-3.5 px-4">Readmission</th>
+                                <th class="py-3.5 px-4">Outcome</th>
+                                <th class="py-3.5 px-4">Satisfaction</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patients-table-body" class="divide-y divide-slate-200/30">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination Footer -->
+                <div class="p-4 border-t border-slate-200/40 flex items-center justify-between text-xs text-slate-400">
+                    <div id="pagination-info">Showing 0 to 0 of 0 entries</div>
+                    <div class="flex space-x-2">
+                        <button id="btn-prev" onclick="changePage(-1)" class="px-3 py-1.5 border border-slate-300/40 rounded-lg themed-card hover:opacity-80 disabled:opacity-40 transition">Previous</button>
+                        <span id="page-indicator" class="px-3 py-1.5 font-semibold">1</span>
+                        <button id="btn-next" onclick="changePage(1)" class="px-3 py-1.5 border border-slate-300/40 rounded-lg themed-card hover:opacity-80 disabled:opacity-40 transition">Next</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 4: DEEP ANALYTICS -->
+        <!-- ========================================================================= -->
+        <section id="tab-analytics" class="hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Satisfaction vs Age Group -->
+                <div class="themed-card p-6 rounded-2xl shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-base font-semibold">Patient Satisfaction Across Age Demographics</h3>
+                        <span class="text-xs font-semibold theme-badge px-2.5 py-1 rounded-full">&beta; = -0.75 Correlation</span>
+                    </div>
+                    <div class="h-80">
+                        <canvas id="chartSatAge"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-3 leading-relaxed">
+                        Data clearly validates that elderly cohorts consistently report lower experience ratings due to complex recoveries and higher out-of-pocket expenses.
+                    </p>
+                </div>
+
+                <!-- Length of Stay Distribution -->
+                <div class="themed-card p-6 rounded-2xl shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-base font-semibold">Hospital Duration Tiers (Length of Stay)</h3>
+                        <span class="text-xs font-medium theme-badge px-2 py-1 rounded-md">Cohort Bins</span>
+                    </div>
+                    <div class="h-80">
+                        <canvas id="chartLosDist"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-3 leading-relaxed">
+                        Inpatient stay duration is segmented into Short (1-7 days), Medium (8-30 days), and Long (31+ days).
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal for Adding New Patient -->
+    <div id="add-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="themed-card rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-200/40 pb-3">
+                <h3 class="text-lg font-bold">Register New Inpatient Admission</h3>
+                <button onclick="closeAddModal()" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
+            </div>
+
+            <form id="add-patient-form" onsubmit="submitNewPatient(event)" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-400">Age</label>
+                        <input type="number" id="new-age" value="50" min="1" max="110" required class="w-full px-3 py-2 border border-slate-300/40 rounded-xl text-xs bg-white/40">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-400">Gender</label>
+                        <select id="new-gender" class="w-full px-3 py-2 border border-slate-300/40 rounded-xl text-xs bg-white/40">
+                            <option value="Female">Female</option>
+                            <option value="Male">Male</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold mb-1 text-slate-400">Medical Condition</label>
+                    <select id="new-condition" onchange="onNewConditionChange()" class="w-full px-3 py-2 border border-slate-300/40 rounded-xl text-xs bg-white/40"></select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold mb-1 text-slate-400">Procedure</label>
+                    <input type="text" id="new-procedure" readonly class="w-full px-3 py-2 border border-slate-300/40 rounded-xl text-xs bg-slate-100/50 opacity-80">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-400">Cost ($)</label>
+                        <input type="number" id="new-cost" value="8000" min="50" required class="w-full px-3 py-2 border border-slate-300/40 rounded-xl text-xs bg-white/40">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-400">Stay Duration (Days)</label>
+                        <input type="number" id="new-los" value="5" min="1" required class="w-full px-3 py-2 border border-slate-300/40 rounded-xl text-xs bg-white/40">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-400">Readmission</label>
+                        <select id="new-readmit" class="w-full px-2 py-2 border border-slate-300/40 rounded-xl text-xs bg-white/40">
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-400">Outcome</label>
+                        <select id="new-outcome" class="w-full px-2 py-2 border border-slate-300/40 rounded-xl text-xs bg-white/40">
+                            <option value="Recovered">Recovered</option>
+                            <option value="Stable">Stable</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-400">Satisfaction (1-5)</label>
+                        <input type="number" id="new-sat" value="4" min="1" max="5" required class="w-full px-2 py-2 border border-slate-300/40 rounded-xl text-xs bg-white/40">
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-3 border-t border-slate-200/40">
+                    <button type="button" onclick="closeAddModal()" class="px-4 py-2 border border-slate-300/40 rounded-xl text-xs font-semibold themed-card hover:opacity-80">Cancel</button>
+                    <button type="submit" class="px-5 py-2 theme-btn-primary rounded-xl text-xs font-semibold shadow-sm">Save Patient</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        let metadata = null;
+        let currentPage = 1;
+        let searchTimer = null;
+        let charts = {};
+        
+        // PALETTE DEFINITIONS FOR CHART.JS
+        const THEME_PALETTES = {
+            ocean: {
+                main: '#0284c7',
+                sec: '#38bdf8',
+                ter: '#818cf8',
+                accent: '#0369a1',
+                text: '#64748b',
+                grid: 'rgba(0,0,0,0.06)'
+            },
+            emerald: {
+                main: '#059669',
+                sec: '#34d399',
+                ter: '#0d9488',
+                accent: '#047857',
+                text: '#047857',
+                grid: 'rgba(5, 150, 105, 0.08)'
+            },
+            purple: {
+                main: '#7c3aed',
+                sec: '#a78bfa',
+                ter: '#c084fc',
+                accent: '#6d28d9',
+                text: '#6b21a8',
+                grid: 'rgba(124, 58, 237, 0.08)'
+            },
+            coral: {
+                main: '#ea580c',
+                sec: '#fb923c',
+                ter: '#f59e0b',
+                accent: '#c2410c',
+                text: '#9a3412',
+                grid: 'rgba(234, 88, 12, 0.08)'
+            },
+            midnight: {
+                main: '#38bdf8',
+                sec: '#34d399',
+                ter: '#818cf8',
+                accent: '#0284c7',
+                text: '#94a3b8',
+                grid: 'rgba(255, 255, 255, 0.08)'
+            }
+        };
+
+        let currentColourTheme = localStorage.getItem('dashboard_colour_theme') || 'ocean';
+
+        function setColourTheme(themeName) {
+            currentColourTheme = themeName;
+            localStorage.setItem('dashboard_colour_theme', themeName);
+
+            // Apply HTML data attribute
+            if (themeName === 'ocean') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', themeName);
+            }
+
+            // Update Chart.js themes
+            updateChartsColors(themeName);
+        }
+
+        function updateChartsColors(themeName) {
+            const p = THEME_PALETTES[themeName] || THEME_PALETTES.ocean;
+
+            if (charts.condVol) {
+                charts.condVol.data.datasets[0].backgroundColor = p.main;
+                applyScaleColors(charts.condVol, p);
+                charts.condVol.update();
+            }
+
+            if (charts.procCost) {
+                charts.procCost.data.datasets[0].backgroundColor = p.sec;
+                applyScaleColors(charts.procCost, p);
+                charts.procCost.update();
+            }
+
+            if (charts.readmitRate) {
+                applyScaleColors(charts.readmitRate, p);
+                charts.readmitRate.update();
+            }
+
+            if (charts.satAge) {
+                charts.satAge.data.datasets[0].borderColor = p.main;
+                charts.satAge.data.datasets[0].pointBackgroundColor = p.main;
+                charts.satAge.data.datasets[0].backgroundColor = p.main + '22';
+                applyScaleColors(charts.satAge, p);
+                charts.satAge.update();
+            }
+
+            if (charts.gender) {
+                charts.gender.data.datasets[0].backgroundColor = [p.main, p.ter];
+                if (charts.gender.options.plugins && charts.gender.options.plugins.legend) {
+                    charts.gender.options.plugins.legend.labels.color = p.text;
+                }
+                charts.gender.update();
+            }
+
+            if (charts.losDist) {
+                charts.losDist.data.datasets[0].backgroundColor = [p.sec, p.main, p.ter];
+                if (charts.losDist.options.plugins && charts.losDist.options.plugins.legend) {
+                    charts.losDist.options.plugins.legend.labels.color = p.text;
+                }
+                charts.losDist.update();
+            }
+        }
+
+        function applyScaleColors(chart, p) {
+            if (chart.options && chart.options.scales) {
+                if (chart.options.scales.x) {
+                    chart.options.scales.x.ticks = chart.options.scales.x.ticks || {};
+                    chart.options.scales.x.ticks.color = p.text;
+                    chart.options.scales.x.grid = chart.options.scales.x.grid || {};
+                    chart.options.scales.x.grid.color = p.grid;
+                }
+                if (chart.options.scales.y) {
+                    chart.options.scales.y.ticks = chart.options.scales.y.ticks || {};
+                    chart.options.scales.y.ticks.color = p.text;
+                    chart.options.scales.y.grid = chart.options.scales.y.grid || {};
+                    chart.options.scales.y.grid.color = p.grid;
+                }
+            }
+        }
+
+        // Tab Navigation
+        function switchTab(tabName) {
+            ['overview', 'predictor', 'patients', 'analytics'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`tab-btn-${t}`).classList.remove('active');
+            });
+
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-btn-${tabName}`).classList.add('active');
+
+            if (tabName === 'patients' && document.getElementById('patients-table-body').children.length === 0) {
+                loadPatients(1);
+            }
+        }
+
+        // Initialize App
+        async function initApp() {
+            setColourTheme(currentColourTheme);
+
+            try {
+                // 1. Fetch Metadata
+                const metaRes = await fetch('/api/metadata');
+                metadata = await metaRes.json();
+                populateDropdowns();
+
+                // 2. Fetch KPIs
+                const kpiRes = await fetch('/api/kpis');
+                const kpis = await kpiRes.json();
+                renderKPIs(kpis);
+
+                // 3. Fetch Charts
+                const chartRes = await fetch('/api/charts');
+                const chartData = await chartRes.json();
+                renderCharts(chartData);
+
+                // 4. Load initial patients
+                loadPatients(1);
+
+                // 5. Run default prediction
+                onConditionChange();
+                document.getElementById('prediction-form').dispatchEvent(new Event('submit'));
+            } catch (err) {
+                console.error("Initialization error:", err);
+            }
+        }
+
+        function populateDropdowns() {
+            if (!metadata) return;
+
+            const predCondSelect = document.getElementById('pred-condition');
+            const newCondSelect = document.getElementById('new-condition');
+            const filterCondSelect = document.getElementById('filter-condition');
+
+            predCondSelect.innerHTML = '';
+            newCondSelect.innerHTML = '';
+
+            metadata.conditions.forEach(cond => {
+                predCondSelect.add(new Option(cond, cond));
+                newCondSelect.add(new Option(cond, cond));
+                filterCondSelect.add(new Option(cond, cond));
+            });
+        }
+
+        function onConditionChange() {
+            const cond = document.getElementById('pred-condition').value;
+            if (metadata && metadata.condition_mappings[cond]) {
+                const info = metadata.condition_mappings[cond];
+                document.getElementById('pred-procedure').value = info.procedure;
+                document.getElementById('pred-cost').value = info.default_cost;
+            }
+        }
+
+        function onNewConditionChange() {
+            const cond = document.getElementById('new-condition').value;
+            if (metadata && metadata.condition_mappings[cond]) {
+                const info = metadata.condition_mappings[cond];
+                document.getElementById('new-procedure').value = info.procedure;
+                document.getElementById('new-cost').value = info.default_cost;
+            }
+        }
+
+        function renderKPIs(kpis) {
+            document.getElementById('kpi-total-patients').innerText = kpis.total_patients.toLocaleString();
+            document.getElementById('kpi-total-cost').innerText = '$' + (kpis.total_cost / 1000000).toFixed(2) + 'M';
+            document.getElementById('kpi-avg-cost').innerText = `Avg: $${kpis.avg_cost.toLocaleString()} / pt`;
+            document.getElementById('kpi-avg-stay').innerText = `${kpis.avg_stay} Days`;
+            document.getElementById('kpi-readmit-rate').innerText = `${kpis.readmission_rate}%`;
+            document.getElementById('kpi-readmit-count').innerText = `${kpis.readmission_count} Readmitted`;
+            document.getElementById('kpi-satisfaction').innerText = `${kpis.avg_satisfaction} / 5.0`;
+            document.getElementById('kpi-recovered-rate').innerText = `Recovery: ${kpis.recovered_rate}%`;
+
+            if (kpis.gender_distribution) {
+                document.getElementById('lbl-female-count').innerText = kpis.gender_distribution['Female'] || 0;
+                document.getElementById('lbl-male-count').innerText = kpis.gender_distribution['Male'] || 0;
+            }
+        }
+
+        function renderCharts(data) {
+            const p = THEME_PALETTES[currentColourTheme] || THEME_PALETTES.ocean;
+
+            // Readmission Rate by Condition
+            charts.readmitRate = new Chart(document.getElementById('chartReadmitRate'), {
+                type: 'bar',
+                data: {
+                    labels: data.condition_labels,
+                    datasets: [{
+                        label: 'Readmission Rate (%)',
+                        data: data.condition_readmit_rates,
+                        backgroundColor: data.condition_readmit_rates.map(v => v >= 80 ? '#f43f5e' : (v >= 40 ? '#f59e0b' : '#10b981')),
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: {
+                            max: 105,
+                            ticks: { callback: v => v + '%', color: p.text },
+                            grid: { color: p.grid }
+                        },
+                        y: {
+                            ticks: { color: p.text },
+                            grid: { color: p.grid }
+                        }
+                    }
+                }
+            });
+
+            // Volume by Condition
+            charts.condVol = new Chart(document.getElementById('chartConditionVol'), {
+                type: 'bar',
+                data: {
+                    labels: data.condition_labels,
+                    datasets: [{
+                        label: 'Patients',
+                        data: data.condition_volumes,
+                        backgroundColor: p.main,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { color: p.text }, grid: { color: p.grid } },
+                        y: { ticks: { color: p.text }, grid: { color: p.grid } }
+                    }
+                }
+            });
+
+            // Procedure Costs
+            charts.procCost = new Chart(document.getElementById('chartProcCost'), {
+                type: 'bar',
+                data: {
+                    labels: data.procedure_labels,
+                    datasets: [{
+                        label: 'Avg Cost ($)',
+                        data: data.procedure_costs,
+                        backgroundColor: p.sec,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { ticks: { callback: v => '$' + v.toLocaleString(), color: p.text }, grid: { color: p.grid } },
+                        x: { ticks: { color: p.text }, grid: { color: p.grid } }
+                    }
+                }
+            });
+
+            // Gender Doughnut
+            charts.gender = new Chart(document.getElementById('chartGender'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Female', 'Male'],
+                    datasets: [{
+                        data: [524, 460],
+                        backgroundColor: [p.main, p.ter]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: p.text } }
+                    }
+                }
+            });
+
+            // Deep Analytics: Sat vs Age
+            charts.satAge = new Chart(document.getElementById('chartSatAge'), {
+                type: 'line',
+                data: {
+                    labels: data.age_group_labels,
+                    datasets: [{
+                        label: 'Average Satisfaction (1 to 5)',
+                        data: data.age_group_satisfaction,
+                        borderColor: p.main,
+                        backgroundColor: p.main + '22',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 6,
+                        pointBackgroundColor: p.main
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { min: 1, max: 5, ticks: { color: p.text }, grid: { color: p.grid } },
+                        x: { ticks: { color: p.text }, grid: { color: p.grid } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: p.text } }
+                    }
+                }
+            });
+
+            // Deep Analytics: LOS Dist
+            charts.losDist = new Chart(document.getElementById('chartLosDist'), {
+                type: 'doughnut',
+                data: {
+                    labels: data.los_labels,
+                    datasets: [{
+                        data: data.los_volumes,
+                        backgroundColor: [p.sec, p.main, p.ter]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: p.text } }
+                    }
+                }
+            });
+        }
+
+        // Live Prediction Handler
+        async function runPrediction(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-predict');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i><span>Analyzing Clinical Factors...</span>`;
+
+            const payload = {
+                age: parseInt(document.getElementById('pred-age').value),
+                gender: document.getElementById('pred-gender').value,
+                condition: document.getElementById('pred-condition').value,
+                cost: parseInt(document.getElementById('pred-cost').value),
+                length_of_stay: parseInt(document.getElementById('pred-los').value),
+                outcome: document.getElementById('pred-outcome').value
+            };
+
+            try {
+                const res = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const pred = await res.json();
+
+                // Update UI
+                const tierElem = document.getElementById('res-risk-tier');
+                tierElem.innerText = `${pred.risk_tier} READMISSION RISK`;
+                if (pred.risk_tier === 'CRITICAL') {
+                    tierElem.className = 'px-3 py-1 rounded-full text-xs font-extrabold uppercase bg-rose-500/10 text-rose-500 border border-rose-500/30';
+                    document.getElementById('res-prob-bar').className = 'bg-rose-500 h-3 rounded-full transition-all duration-700';
+                } else if (pred.risk_tier === 'MODERATE') {
+                    tierElem.className = 'px-3 py-1 rounded-full text-xs font-extrabold uppercase bg-amber-500/10 text-amber-500 border border-amber-500/30';
+                    document.getElementById('res-prob-bar').className = 'bg-amber-500 h-3 rounded-full transition-all duration-700';
+                } else {
+                    tierElem.className = 'px-3 py-1 rounded-full text-xs font-extrabold uppercase bg-emerald-500/10 text-emerald-500 border border-emerald-500/30';
+                    document.getElementById('res-prob-bar').className = 'bg-emerald-500 h-3 rounded-full transition-all duration-700';
+                }
+
+                document.getElementById('res-readmit-prob').innerText = `${pred.readmission_probability}%`;
+                document.getElementById('res-prob-bar').style.width = `${Math.min(100, pred.readmission_probability)}%`;
+
+                document.getElementById('res-sat-score').innerHTML = `${pred.predicted_satisfaction} <span class="text-sm font-normal text-slate-400">/ 5.0</span>`;
+
+                // Render Stars
+                const fullStars = Math.round(pred.predicted_satisfaction);
+                let starHtml = '';
+                for (let i = 1; i <= 5; i++) {
+                    starHtml += i <= fullStars ? '<i class="fa-solid fa-star"></i>' : '<i class="fa-regular fa-star text-slate-300"></i>';
+                }
+                document.getElementById('res-sat-stars').innerHTML = starHtml;
+
+                // Recommendations list
+                const recsList = document.getElementById('res-recs-list');
+                recsList.innerHTML = '';
+                pred.recommendations.forEach(rec => {
+                    const li = document.createElement('li');
+                    li.className = 'flex items-start p-2.5 rounded-lg border border-slate-200/40';
+                    li.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-500 mt-0.5 mr-2"></i><span>${rec}</span>`;
+                    recsList.appendChild(li);
+                });
+
+            } catch (err) {
+                alert("Prediction error: " + err);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i><span>Run AI Clinical Risk Assessment</span>`;
+            }
+        }
+
+        // Load Patients Table
+        async function loadPatients(page = 1) {
+            currentPage = page;
+            const search = document.getElementById('filter-search').value;
+            const cond = document.getElementById('filter-condition').value;
+            const readmit = document.getElementById('filter-readmission').value;
+            const outcome = document.getElementById('filter-outcome').value;
+
+            const url = `/api/patients?page=${page}&limit=10&search=${encodeURIComponent(search)}&condition=${encodeURIComponent(cond)}&readmission=${encodeURIComponent(readmit)}&outcome=${encodeURIComponent(outcome)}`;
+
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+
+                const tbody = document.getElementById('patients-table-body');
+                tbody.innerHTML = '';
+
+                if (data.data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-400 font-medium">No patient records found matching filter criteria.</td></tr>`;
+                } else {
+                    data.data.forEach(pt => {
+                        const tr = document.createElement('tr');
+                        tr.className = 'hover:opacity-80 transition';
+
+                        const readmitBadge = pt.Readmission === 'Yes' ?
+                            `<span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-500 border border-rose-500/20">Readmitted</span>` :
+                            `<span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">No</span>`;
+
+                        const outcomeBadge = pt.Outcome === 'Recovered' ?
+                            `<span class="text-emerald-500 font-semibold flex items-center"><i class="fa-solid fa-circle-check mr-1 text-xs"></i> Recovered</span>` :
+                            `<span class="text-slate-400 font-medium flex items-center"><i class="fa-solid fa-circle-pause mr-1 text-xs"></i> Stable</span>`;
+
+                        tr.innerHTML = `
+                            <td class="py-3 px-4 font-mono font-bold">#${pt.Patient_ID}</td>
+                            <td class="py-3 px-4">
+                                <span class="font-medium">${pt.Age} yrs</span>
+                                <span class="text-slate-400 text-xs block">${pt.Gender}</span>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="font-semibold block">${pt.Condition}</span>
+                                <span class="text-slate-400 text-xs">${pt.Procedure}</span>
+                            </td>
+                            <td class="py-3 px-4">${pt.Length_of_Stay} Days</td>
+                            <td class="py-3 px-4 font-semibold">$${pt.Cost.toLocaleString()}</td>
+                            <td class="py-3 px-4">${readmitBadge}</td>
+                            <td class="py-3 px-4">${outcomeBadge}</td>
+                            <td class="py-3 px-4">
+                                <span class="font-bold mr-1">${pt.Satisfaction}</span>
+                                <i class="fa-solid fa-star text-amber-400 text-xs"></i>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+
+                // Update pagination controls
+                document.getElementById('pagination-info').innerText = `Showing page ${data.page} of ${data.total_pages} (${data.total} total patients)`;
+                document.getElementById('page-indicator').innerText = data.page;
+                document.getElementById('btn-prev').disabled = data.page <= 1;
+                document.getElementById('btn-next').disabled = data.page >= data.total_pages;
+
+            } catch (err) {
+                console.error("Error loading patients:", err);
+            }
+        }
+
+        function debouncePatientSearch() {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => { loadPatients(1); }, 300);
+        }
+
+        function changePage(delta) {
+            loadPatients(currentPage + delta);
+        }
+
+        function openAddModal() {
+            onNewConditionChange();
+            document.getElementById('add-modal').classList.remove('hidden');
+        }
+
+        function closeAddModal() {
+            document.getElementById('add-modal').classList.add('hidden');
+        }
+
+        async function submitNewPatient(e) {
+            e.preventDefault();
+            const payload = {
+                age: parseInt(document.getElementById('new-age').value),
+                gender: document.getElementById('new-gender').value,
+                condition: document.getElementById('new-condition').value,
+                procedure: document.getElementById('new-procedure').value,
+                cost: parseInt(document.getElementById('new-cost').value),
+                length_of_stay: parseInt(document.getElementById('new-los').value),
+                readmission: document.getElementById('new-readmit').value,
+                outcome: document.getElementById('new-outcome').value,
+                satisfaction: parseInt(document.getElementById('new-sat').value)
+            };
+
+            try {
+                const res = await fetch('/api/patients', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    closeAddModal();
+                    alert("Patient registered successfully!");
+                    // Refresh data
+                    const kpiRes = await fetch('/api/kpis');
+                    renderKPIs(await kpiRes.json());
+                    loadPatients(1);
+                } else {
+                    alert("Failed to add patient.");
+                }
+            } catch (err) {
+                alert("Error: " + err);
+            }
+        }
+
+        // Start
+        window.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
