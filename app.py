@@ -5,11 +5,22 @@ import pandas as pd
 import numpy as np
 from flask import Flask, render_template, request, jsonify, send_file
 
-app = Flask(__name__, template_folder='templates', static_folder='static')
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 
-CSV_PATH = 'hospital_data_cleaned.csv'
-READMISSION_MODEL_PATH = 'models/readmission_model.joblib'
-SATISFACTION_MODEL_PATH = 'models/satisfaction_model.joblib'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+app = Flask(
+    __name__,
+    template_folder=os.path.join(BASE_DIR, 'templates'),
+    static_folder=os.path.join(BASE_DIR, 'static')
+)
+
+CSV_PATH = os.path.join(BASE_DIR, 'hospital_data_cleaned.csv')
+READMISSION_MODEL_PATH = os.path.join(BASE_DIR, 'models', 'readmission_model.joblib')
+SATISFACTION_MODEL_PATH = os.path.join(BASE_DIR, 'models', 'satisfaction_model.joblib')
 
 # In-memory cached dataset & models
 df_cache = None
@@ -25,12 +36,78 @@ def get_data():
             df_cache = pd.DataFrame()
     return df_cache
 
+def train_fallback_models():
+    global readmit_model, sat_model
+    df = get_data()
+    if df.empty:
+        return
+
+    if readmit_model is None:
+        features_clf = ['Age', 'Gender', 'Condition', 'Cost', 'Length_of_Stay', 'Outcome']
+        X_clf = df[features_clf]
+        y_clf = df['Readmission_Flag']
+        cat_features_clf = ['Gender', 'Condition', 'Outcome']
+        num_features_clf = ['Age', 'Cost', 'Length_of_Stay']
+
+        preprocessor_clf = ColumnTransformer(
+            transformers=[
+                ('num', StandardScaler(), num_features_clf),
+                ('cat', OneHotEncoder(handle_unknown='ignore', sparse_output=False), cat_features_clf)
+            ]
+        )
+        readmit_model = Pipeline(steps=[
+            ('prep', preprocessor_clf),
+            ('model', RandomForestClassifier(n_estimators=100, random_state=42))
+        ])
+        readmit_model.fit(X_clf, y_clf)
+        try:
+            os.makedirs(os.path.dirname(READMISSION_MODEL_PATH), exist_ok=True)
+            joblib.dump(readmit_model, READMISSION_MODEL_PATH)
+        except Exception:
+            pass
+
+    if sat_model is None:
+        features_reg = ['Age', 'Gender', 'Condition', 'Cost', 'Length_of_Stay', 'Readmission', 'Outcome']
+        X_reg = df[features_reg]
+        y_reg = df['Satisfaction']
+        cat_features_reg = ['Gender', 'Condition', 'Readmission', 'Outcome']
+        num_features_reg = ['Age', 'Cost', 'Length_of_Stay']
+
+        preprocessor_reg = ColumnTransformer(
+            transformers=[
+                ('num', StandardScaler(), num_features_reg),
+                ('cat', OneHotEncoder(handle_unknown='ignore', sparse_output=False), cat_features_reg)
+            ]
+        )
+        sat_model = Pipeline(steps=[
+            ('prep', preprocessor_reg),
+            ('model', RandomForestRegressor(n_estimators=100, random_state=42))
+        ])
+        sat_model.fit(X_reg, y_reg)
+        try:
+            os.makedirs(os.path.dirname(SATISFACTION_MODEL_PATH), exist_ok=True)
+            joblib.dump(sat_model, SATISFACTION_MODEL_PATH)
+        except Exception:
+            pass
+
 def load_models():
     global readmit_model, sat_model
     if readmit_model is None and os.path.exists(READMISSION_MODEL_PATH):
-        readmit_model = joblib.load(READMISSION_MODEL_PATH)
+        try:
+            readmit_model = joblib.load(READMISSION_MODEL_PATH)
+        except Exception as e:
+            print("Notice: Retraining readmission model due to version compatibility:", e)
+            readmit_model = None
+
     if sat_model is None and os.path.exists(SATISFACTION_MODEL_PATH):
-        sat_model = joblib.load(SATISFACTION_MODEL_PATH)
+        try:
+            sat_model = joblib.load(SATISFACTION_MODEL_PATH)
+        except Exception as e:
+            print("Notice: Retraining satisfaction model due to version compatibility:", e)
+            sat_model = None
+
+    if readmit_model is None or sat_model is None:
+        train_fallback_models()
 
 # Initial load
 get_data()
@@ -310,5 +387,6 @@ def export_csv():
     return jsonify({"error": "File not found"}), 404
 
 if __name__ == '__main__':
-    print("HealthPulse AI Hospital Intelligence Server starting on http://127.0.0.1:5000")
-    app.run(host='127.0.0.1', port=5000, debug=False)
+    port = int(os.environ.get("PORT", 5000))
+    print(f"HealthPulse AI Server starting on http://0.0.0.0:{port}")
+    app.run(host='0.0.0.0', port=port, debug=False)
